@@ -79,10 +79,7 @@ class RLAgent(nn.Module):
         done = False
 
         while not done:
-            if self.random_state.rand() < eps:
-                action = self.env.action_space.sample()
-            else:
-                action = self.get_action(state)
+            action = self.e_greedy_action(eps, state)
 
             next_state, reward, done, *_ = self.env.step(action)
 
@@ -99,6 +96,23 @@ class RLAgent(nn.Module):
                 self.train_model(transitions, i)
 
         return episode_reward, episode_length
+
+    def e_greedy_action(self, eps, state):
+        """
+        Returns an epsilon greedy action given the state
+
+        Args:
+            eps: the current epsilon
+            state: the current state
+
+        Returns:
+            the action to take
+        """
+        if self.random_state.rand() < eps:
+            action = self.env.action_space.sample()
+        else:
+            action = self.get_action(state)
+        return action
 
     def end_train_episode(self, episode: int, total_steps: int) -> None:
         """
@@ -197,6 +211,7 @@ class RLAgent(nn.Module):
             a tuple of torch tensors (states, actions, rewards, next_states, dones)
         """
         states, actions, rewards, next_states, dones = transitions
+
         states = torch.tensor(states, dtype=torch.float32, device=self.device)
         actions = torch.tensor(
             actions, dtype=torch.float32, device=self.device)
@@ -228,14 +243,16 @@ class RLAgent(nn.Module):
         while not done:
             env.render()
 
-            action = self.get_action(state)
+            action = self.e_greedy_action(0.1, state)
             state, reward, done, *_ = env.step(action)
+            vis_env.step(action)
+
             total_length += 1
             total_reward += reward
+
             if total_length > max_length:
                 break
-            vis_env.step(action)
-            time.sleep(0.1)
+            time.sleep(0.01)
 
         print(f"Total length: {total_length}")
         print(f"Total reward: {total_reward}")

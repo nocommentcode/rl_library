@@ -7,10 +7,13 @@ import argparse
 from typing import List, Tuple
 
 
-class A2CParams(FeatureEncoderParams):
+class DDPGParams(FeatureEncoderParams):
     actor_fc: List[int]
     critic_fc: List[int]
-    agent_name = "A2C"
+    phi: float
+    exploration_sigma: float
+
+    agent_name = "DDPG"
 
     def add_arguments(self, parser: argparse.ArgumentParser) -> None:
         super().add_arguments(parser)
@@ -22,6 +25,12 @@ class A2CParams(FeatureEncoderParams):
                             nargs='+',
                             default=[32],
                             help='Critic fully connected layer output features')
+        parser.add_argument('-phi', type=float,
+                            default=0.95,
+                            help='Target update rate')
+        parser.add_argument('-es', '--exploration_sigma', type=float,
+                            default=0.2,
+                            help='Exploration sigma')
 
     def set_args(self, **kwargs) -> None:
         super().set_args(**kwargs)
@@ -29,6 +38,9 @@ class A2CParams(FeatureEncoderParams):
             else kwargs['afc']
         self.critic_fc = kwargs['critic_fully_connected'] if 'critic_fully_connected' in kwargs \
             else kwargs['cfc']
+        self.phi = kwargs['phi']
+        self.exploration_sigma = kwargs['exploration_sigma'] if 'exploration_sigma' in kwargs \
+            else kwargs['es']
 
     def build_model(self) -> Tuple[nn.Module, nn.Module, nn.Module]:
         """
@@ -42,16 +54,17 @@ class A2CParams(FeatureEncoderParams):
         env = self.make_env()
         observation_space = env.observation_space
         state_space = observation_space.shape
-        n_actions = env.action_space.n
+        n_actions = env.action_space.shape[0]
 
         shared_conv = self.build_encoder()
 
         conv_output_features = shared_conv(
-            torch.zeros(1, *state_space)).shape[1]
+            torch.zeros(1, *state_space).to(self.device)).shape[1]
 
         # critic
         critic = nn.Sequential()
-        in_features = conv_output_features
+        # ddpg gets the state and action as input to the critic
+        in_features = conv_output_features + n_actions
         for out_features in self.critic_fc:
             critic.append(torch.nn.Linear(
                 in_features, out_features, bias=True))
@@ -68,7 +81,9 @@ class A2CParams(FeatureEncoderParams):
             actor.append(torch.nn.ReLU())
             in_features = out_features
         actor.append(torch.nn.Linear(in_features, n_actions))
-        actor.append(torch.nn.Softmax(dim=-1))
+
+        # ddpg gets a tanh activation on the output
+        actor.append(torch.nn.Tanh())
 
         actor.to(self.device)
         shared_conv.to(self.device)

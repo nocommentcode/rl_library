@@ -3,6 +3,7 @@ from agents.RLAgent import RLAgent
 
 
 import torch
+import torch.nn as nn
 
 
 class A2CAgent(RLAgent):
@@ -41,15 +42,17 @@ class A2CAgent(RLAgent):
 
         states, actions, rewards, next_states, dones = self.transition_to_torch_batch(
             transitions)
+        N = len(states)
 
         conv_output = self.shared_conv(states)
 
         # critic
         Vs = self.critic(conv_output)
         with torch.no_grad():
-            Vs_ = self.critic(self.shared_conv(next_states)) * (1 - dones)
-        advantage = rewards + self.gamma * Vs_ - Vs
-        critic_loss = advantage.pow(2).mean()
+            Vs_ = self.critic(self.shared_conv(next_states))
+
+        advantage = rewards + self.gamma * Vs_.view(N) * (1 - dones)
+        critic_loss = nn.functional.mse_loss(Vs, advantage.view(N, 1))
 
         # actor
         log_probs = self.actor(conv_output).log_softmax(dim=1)
