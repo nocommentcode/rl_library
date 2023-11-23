@@ -37,6 +37,8 @@ class RLAgentParams:
     run_name: str
     # the name of the agent
     agent_name = "RLAgent"
+    # train model after n steps
+    model_train_steps: int
 
     def parse_args(self, args) -> None:
         if args.file is not None:
@@ -68,6 +70,8 @@ class RLAgentParams:
                             help='Log to tensorboard')
         parser.add_argument('--device', type=str, default='cuda',
                             help='Device to run on')
+        parser.add_argument('-mt', '--model_train_steps', type=int, default=1,
+                            help='Train model after n steps')
 
     def load_json_file(self, file_path: str) -> dict:
         with open(file_path, 'r') as f:
@@ -90,6 +94,7 @@ class RLAgentParams:
         self.seed = kwargs['seed']
         self.log = kwargs['log']
         self.device = kwargs['device']
+        self.model_train_steps = kwargs['model_train_steps']
         self.run_name = f"{self.env_name}_{self.agent_name}_{time.strftime('%Y%m%d-%H%M%S')}"
         self.save_dir = f"runs/{self.run_name}"
 

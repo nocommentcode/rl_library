@@ -33,7 +33,7 @@ class DeepQNetwork(torch.nn.Module):
             next_q = tdqn(next_states).max(dim=1)[0] * (1 - dones)
 
         target = rewards + gamma * next_q
-        loss = nn.functional.mse_loss(q, target)
+        loss = nn.functional.huber_loss(q, target)
 
         self.optimizer.zero_grad()
         loss.backward()

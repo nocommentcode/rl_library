@@ -94,7 +94,7 @@ class RLAgent(nn.Module):
 
             state = next_state
 
-            if len(self.replay_buffer) >= self.batch_size:
+            if len(self.replay_buffer) >= self.batch_size and total_steps % self.args.model_train_steps == 0:
                 transitions = self.replay_buffer.draw(self.batch_size)
                 self.train_model(transitions, i)
 

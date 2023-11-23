@@ -36,7 +36,7 @@ class DeepQAgent(RLAgent):
         self.log("loss", loss, episode)
 
     def end_train_episode(self, episode: int, total_steps: int) -> None:
-        if total_steps % self.sync_target_every_n_episodes == 0:
+        if total_steps % self.target_update_steps == 0:
             self.tdqn.load_state_dict(self.dqn.state_dict())
 
     @staticmethod

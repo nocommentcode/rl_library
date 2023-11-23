@@ -14,4 +14,4 @@ class DeepQParams(DiscreteActionAgentParams):
 
     def set_args(self, **kwargs) -> None:
         super().set_args(**kwargs)
-        self.sync_target_every_n_episodes = kwargs['target_update_steps']
+        self.target_update_steps = kwargs['target_update_steps']
