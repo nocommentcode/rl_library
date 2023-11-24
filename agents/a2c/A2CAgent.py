@@ -10,6 +10,7 @@ class A2CAgent(RLAgent):
 
     def __init__(self, params: A2CParams) -> None:
         super().__init__(params)
+        self.actor_loss_weight = params.actor_loss_weight
         self.shared_conv, self.actor, self.critic = params.build_model()
         self.optimiser = torch.optim.Adam(
             list(self.shared_conv.parameters()) +
@@ -56,7 +57,7 @@ class A2CAgent(RLAgent):
         actor_loss = -(log_probs * advantage.detach()).mean()
 
         # update
-        total_loss = actor_loss + critic_loss
+        total_loss = self.actor_loss_weight * actor_loss + critic_loss
         self.optimiser.zero_grad()
         total_loss.backward()
         self.optimiser.step()

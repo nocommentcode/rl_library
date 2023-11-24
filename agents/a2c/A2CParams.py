@@ -10,6 +10,7 @@ from typing import List, Tuple
 class A2CParams(FeatureEncoderParams):
     actor_fc: List[int]
     critic_fc: List[int]
+    actor_loss_weight: float
     agent_name = "A2C"
 
     def add_arguments(self, parser: argparse.ArgumentParser) -> None:
@@ -22,6 +23,9 @@ class A2CParams(FeatureEncoderParams):
                             nargs='+',
                             default=[32],
                             help='Critic fully connected layer output features')
+        parser.add_argument('-alw', '--actor_loss_weight', type=float,
+                            default=0.05,
+                            help='Actor loss weight')
 
     def set_args(self, **kwargs) -> None:
         super().set_args(**kwargs)
@@ -29,6 +33,8 @@ class A2CParams(FeatureEncoderParams):
             else kwargs['afc']
         self.critic_fc = kwargs['critic_fully_connected'] if 'critic_fully_connected' in kwargs \
             else kwargs['cfc']
+        self.actor_loss_weight = kwargs['actor_loss_weight'] if 'actor_loss_weight' in kwargs \
+            else kwargs['alw']
 
     def build_model(self) -> Tuple[nn.Module, nn.Module, nn.Module]:
         """
