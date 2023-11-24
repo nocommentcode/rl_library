@@ -13,7 +13,7 @@ class A2CAgent(RLAgent):
         self.shared_conv, self.actor, self.critic = params.build_model()
         self.optimiser = torch.optim.Adam(
             list(self.shared_conv.parameters()) +
-            list(self.actor.parameters()),
+            list(self.actor.parameters()) +
             list(self.critic.parameters()),
             lr=params.lr,
         )
