@@ -47,7 +47,7 @@ class A2CParams(FeatureEncoderParams):
         shared_conv = self.build_encoder()
 
         conv_output_features = shared_conv(
-            torch.zeros(1, *state_space)).shape[1]
+            torch.zeros(1, *state_space).to(self.device)).shape[1]
 
         # critic
         critic = nn.Sequential()

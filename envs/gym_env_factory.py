@@ -20,7 +20,7 @@ def gym_env_factory(name: str) -> gym.Env:
     """
     if name in ATARI_ENVS:
         env = AtariPreprocessing(
-            gym.make(name, frameskip=1, full_action_space=False, render_mode='human'), scale_obs=True)
+            gym.make(name, frameskip=1, full_action_space=False), scale_obs=True)
 
     if name in CLASSIC_CONTROL_ENVS:
         env = ClassicControlWrapper(gym.make(name, render_mode='rgb_array'))

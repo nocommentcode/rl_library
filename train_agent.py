@@ -16,7 +16,7 @@ def train_agent(agent_name: str):
     parser.add_argument('-si', '--save_every_n', type=int,
                         default=300,
                         help='Save model every n episodes (-1 to disable)')
-    parser.add_argument('-ctd', '--continue_training_dir', type=str,
+    parser.add_argument('--continue_training_dir', type=str,
                         default=None,
                         help='Continue training from the given directory')
     parser.add_argument('-se', '--starting_episode', type=int,

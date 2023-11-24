@@ -18,12 +18,8 @@ class DDPGAgent(RLAgent):
         self.a_max = torch.tensor(env.action_space.high).to(self.device)
         self.phi = params.phi
 
-        self.actor_optimizer = torch.optim.Adam(
+        self.optimiser = torch.optim.Adam(
             self.actor.parameters(),
-            lr=params.lr,
-        )
-
-        self.critic_optimizer = torch.optim.Adam(
             self.critic.parameters(),
             lr=params.lr,
         )
@@ -72,14 +68,12 @@ class DDPGAgent(RLAgent):
         actor_loss = - pred_values.mean()
 
         # update
-        self.critic_optimizer.zero_grad()
-        self.actor_optimizer.zero_grad()
+        self.self.optimiser.zero_grad()
 
-        critic_loss.backward(retain_graph=True)
-        actor_loss.backward()
+        total_loss = actor_loss + critic_loss
+        total_loss.backward()
 
-        self.critic_optimizer.step()
-        self.actor_optimizer.step()
+        self.optimiser.step()
 
         # update target neworks
         self._update_target_network(self.target_encoder, self.encoder)
