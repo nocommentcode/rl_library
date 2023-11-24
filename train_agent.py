@@ -6,7 +6,8 @@ from agents.RLAgent import RLAgent
 def make_save_callback(save_freq: int, agent: RLAgent):
     def save_callback(episode: int):
         if save_freq > 0 and episode % save_freq == 0:
-            agent.save(f"{agent.args.save_dir}/checkpoints/{episode}")
+            agent.save(
+                f"{agent.args.save_dir}/{agent.args.run_name}/checkpoints/{episode}")
     return save_callback
 
 
@@ -50,7 +51,7 @@ def train_agent(agent_name: str):
                 agent), starting_episode=args.starting_episode)
 
     print("Finished training")
-    agent.save(agent_params.save_dir)
+    agent.save(f"{agent.args.save_dir}/{agent.args.run_name}")
 
 
 if __name__ == "__main__":

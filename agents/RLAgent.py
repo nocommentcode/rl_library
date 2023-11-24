@@ -34,7 +34,7 @@ class RLAgent(nn.Module):
         self.random_state = np.random.RandomState(args.seed)
         self.replay_buffer = ReplayBuffer(args.buffer_size, self.random_state)
         self.writer = SummaryWriter(
-            log_dir=args.save_dir) if args.log else None
+            log_dir=f"{args.save_dir}/{args.run_name}") if args.log else None
 
     def train(self, callback: Callable[[int], None], starting_episode: int = 0) -> None:
         """

@@ -39,6 +39,8 @@ class RLAgentParams:
     agent_name = "RLAgent"
     # train model after n steps
     model_train_steps: int
+    # save directory
+    save_dir: str
 
     def parse_args(self, args) -> None:
         if args.file is not None:
@@ -72,6 +74,8 @@ class RLAgentParams:
                             help='Device to run on')
         parser.add_argument('-mt', '--model_train_steps', type=int, default=1,
                             help='Train model after n steps')
+        parser.add_argument('--save_dir', type=str, default='runs',
+                            help='Save directory')
 
     def load_json_file(self, file_path: str) -> dict:
         with open(file_path, 'r') as f:
@@ -95,8 +99,8 @@ class RLAgentParams:
         self.log = kwargs['log']
         self.device = kwargs['device']
         self.model_train_steps = kwargs['model_train_steps']
+        self.save_dir = kwargs['save_dir']
         self.run_name = f"{self.env_name}_{self.agent_name}_{time.strftime('%Y%m%d-%H%M%S')}"
-        self.save_dir = f"runs/{self.run_name}"
 
     def make_env(self) -> gym.Env:
         return gym_env_factory(self.env_name)
