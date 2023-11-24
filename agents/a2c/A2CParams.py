@@ -30,9 +30,9 @@ class A2CParams(FeatureEncoderParams):
     def set_args(self, **kwargs) -> None:
         super().set_args(**kwargs)
         self.actor_fc = kwargs['actor_fully_connected'] if 'actor_fully_connected' in kwargs \
-            else kwargs['afc']
+            else kwargs['actor_fc']
         self.critic_fc = kwargs['critic_fully_connected'] if 'critic_fully_connected' in kwargs \
-            else kwargs['cfc']
+            else kwargs['critic_fc']
         self.actor_loss_weight = kwargs['actor_loss_weight'] if 'actor_loss_weight' in kwargs \
             else kwargs['alw']
 

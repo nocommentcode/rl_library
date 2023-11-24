@@ -44,9 +44,9 @@ class RLAgent(nn.Module):
             callback: a function to call after each episode
         """
         # exponential decay for epsilon
-        num_episodes = self.max_episodes - starting_episode
         epsilon = np.maximum(self.epsilon * 0.999 **
-                             np.arange(num_episodes), 0.01)
+                             np.arange(self.max_episodes), 0.01)
+        epsilon = epsilon[starting_episode:]
 
         total_steps = 0
         for i, eps in zip(range(starting_episode, self.max_episodes), epsilon):

@@ -100,7 +100,8 @@ class RLAgentParams:
         self.device = kwargs['device']
         self.model_train_steps = kwargs['model_train_steps']
         self.save_dir = kwargs['save_dir']
-        self.run_name = f"{self.env_name}_{self.agent_name}_{time.strftime('%Y%m%d-%H%M%S')}"
+        self.run_name = kwargs[
+            'run_name'] if 'run_name' in kwargs else f"{self.env_name}_{self.agent_name}_{time.strftime('%Y%m%d-%H%M%S')}"
 
     def make_env(self) -> gym.Env:
         return gym_env_factory(self.env_name)
