@@ -6,7 +6,7 @@ from agents.RLAgent import RLAgent
 def make_save_callback(save_freq: int, agent: RLAgent):
     def save_callback(episode: int):
         if save_freq > 0 and episode % save_freq == 0:
-            agent.save(f"{agent.save_dir}/checkpoints/{episode}")
+            agent.save(f"{agent.args.save_dir}/checkpoints/{episode}")
     return save_callback
 
 
@@ -19,15 +19,19 @@ def train_agent(agent_name: str):
     parser.add_argument('-ctd', '--continue_training_dir', type=str,
                         default=None,
                         help='Continue training from the given directory')
+    parser.add_argument('-se', '--starting_episode', type=int,
+                        default=0,
+                        help='Starting episode number')
 
     args, _ = parser.parse_known_args()
 
     if args.continue_training_dir is not None:
         agent = load_agent(agent_name, args.continue_training_dir)
         agent_params = agent.args
+        agent_params.max_episodes += agent_params.max_episodes
 
         print(str(agent_params))
-        print(f"Coninue trianing on {args.device}")
+        print(f"Coninue trianing on {agent_params.device}")
     else:
 
         agent_params = get_agent_params(agent_name)
@@ -42,7 +46,8 @@ def train_agent(agent_name: str):
         print(str(agent_params))
         print(f"Start trianing on {agent_params.device}")
 
-    agent.train(callback=make_save_callback(args.save_every_n, agent))
+    agent.train(callback=make_save_callback(args.save_every_n,
+                agent), starting_episode=args.starting_episode)
 
     print("Finished training")
     agent.save(agent_params.save_dir)

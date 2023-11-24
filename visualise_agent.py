@@ -1,4 +1,5 @@
 import argparse
+import random
 import time
 
 from agent_factory import detect_selected_agent, get_agent, load_agent
@@ -14,7 +15,7 @@ def visualize_episode(agent_name: str):
     args, _ = parser.parse_known_args()
 
     agent = load_agent(agent_name, args.run_dir)
-    agent.visualize(seed=int(time.time()), max_length=args.max_length)
+    agent.visualize(seed=random.randint(0, 100000), max_length=args.max_length)
 
 
 if __name__ == "__main__":

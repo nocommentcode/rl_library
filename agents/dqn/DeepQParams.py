@@ -35,11 +35,12 @@ class DeepQParams(FeatureEncoderParams):
         n_actions = env.action_space.n
 
         model = self.build_encoder()
-        ouput_size = model(torch.zeros(1, *state_space)).shape[1]
+        inputs = torch.zeros(1, *state_space).to(self.device)
+        ouput_size = model(inputs).shape[1]
 
         # add fully connected layers
         in_features = ouput_size
-        for out_features in self.fc[1:]:
+        for out_features in self.fc:
             model.append(nn.Linear(in_features=in_features,
                                    out_features=out_features))
             model.append(nn.ReLU())

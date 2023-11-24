@@ -36,7 +36,7 @@ class RLAgent(nn.Module):
         self.writer = SummaryWriter(
             log_dir=args.save_dir) if args.log else None
 
-    def train(self, callback: Callable[[int], None]) -> None:
+    def train(self, callback: Callable[[int], None], starting_episode: int = 0) -> None:
         """
         Trains the agent using the parameters provided
 
@@ -44,11 +44,12 @@ class RLAgent(nn.Module):
             callback: a function to call after each episode
         """
         # exponential decay for epsilon
+        num_episodes = self.max_episodes - starting_episode
         epsilon = np.maximum(self.epsilon * 0.999 **
-                             np.arange(self.max_episodes), 0.01)
+                             np.arange(num_episodes), 0.01)
 
         total_steps = 0
-        for i, eps in enumerate(epsilon):
+        for i, eps in zip(range(starting_episode, self.max_episodes), epsilon):
 
             episode_reward, episode_length = self.run_episode(
                 total_steps, i, eps)
@@ -232,20 +233,20 @@ class RLAgent(nn.Module):
         """
 
         env = self.args.make_env()
-        vis_env = self.args.make_test_env()
+        # vis_env = self.args.make_test_env()
 
         state, _ = env.reset(seed=seed)
-        vis_env.reset(seed=seed)
+        # vis_env.reset(seed=seed)
         done = False
         total_length = 0
         total_reward = 0
 
         while not done:
-            env.render()
+            env.unwrapped.render()
 
             action = self.e_greedy_action(0.1, state)
             state, reward, done, *_ = env.step(action)
-            vis_env.step(action)
+            # vis_env.step(action)
 
             total_length += 1
             total_reward += reward
